@@ -1,0 +1,6 @@
+[submodule "libs/idiorm"]
+	path = libs/idiorm
+	url = http://github.com/j4mie/idiorm.git
+[submodule "libs/tumblr-php"]
+	path = libs/tumblr-php
+	url = http://github.com/alexdunae/tumblr-php.git
