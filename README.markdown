@@ -19,3 +19,4 @@ TODO
 * Add in extra logging so progress is more visible.
 * Create restore scripts.
 * Make scripts timeout etc aware and safe.
+* Backup images etc as well
