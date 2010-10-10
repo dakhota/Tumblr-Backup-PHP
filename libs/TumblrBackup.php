@@ -1,5 +1,6 @@
 <?php
 require_once('php-rest-api/class.tumblr.php');
+require_once('Download.php');
 /**
  *
  * @author Simon Holywell
@@ -13,7 +14,7 @@ class TumblrBackup extends Tumblr {
     
     /**
      * The database/response fields and their types
-     * @var array
+     * @var array-	`1
      */
     private $fields = array(
         'id'             => 'INTEGER PRIMARY KEY',
@@ -35,6 +36,17 @@ class TumblrBackup extends Tumblr {
         'tags'           => 'TEXT',
         'raw'                => 'TEXT',
     );
+	
+	private $photo_indexes = array(
+		'photo-url-1280',
+		'photo-url-500',
+		'photo-url-400',
+		'photo-url-250',
+		'photo-url-100',
+		'photo-url-75',
+	);
+	
+	private $download = null;
 
     /**
      * Table name
@@ -52,6 +64,7 @@ class TumblrBackup extends Tumblr {
         $this->site = $site;
         parent::__construct($this->site);
         $this->setupTable();
+		$this->setupDownload();
     }
 
     private function setupTable() {
@@ -59,11 +72,17 @@ class TumblrBackup extends Tumblr {
         $SQL = 'CREATE TABLE IF NOT EXISTS ' . $this->table . ' (';
         $SQL_fields = array();
         foreach ($this->fields as $field => $data_type) {
-            $SQL_fields[] = $field . ' ' . $datatype;
+            $SQL_fields[] = $field . ' ' . $data_type;
         }
         $SQL .= implode(',', $SQL_fields) . ');';
         $db->exec($SQL);
     }
+	
+	private function setupDownload() {
+		$Download = new Download();
+		$Download->path .= date('d-m-Y H-i-s') . '/';
+		$this->download = $Download;
+	}
 
     public function get_posts($offset = 0, $limit = 50) {
         $params = array(
@@ -112,8 +131,35 @@ class TumblrBackup extends Tumblr {
             }
             $orm_post->raw = json_encode($post);
             $orm_post->save();
+			
+			if('photo' == $post->type) {
+				$this->save_photos($post);
+			}
         }
     }
+	
+	public function save_photos($post) {
+		$old_path = $this->download->path;
+		$this->download->path .= $post->id . '/';
+		foreach($this->photo_indexes as $index) {
+			if(isset($post->$index)) {
+				$this->download->copy($post->$index);
+			}
+		}
+		
+		if(isset($post->photos)) {
+			$this->download->path .= 'photos/';
+			foreach($post->photos as $photo) {
+				foreach($this->photo_indexes as $index) {
+					if(isset($photo->$index)) {
+						$this->download->copy($photo->$index);
+					}
+				}
+			}
+		}
+		
+		$this->download->path = $old_path;
+	}
 
     public function __set($name, $value) {
         $this->data[$name] = $value;

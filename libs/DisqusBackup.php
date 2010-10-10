@@ -57,7 +57,7 @@ class DisqusBackup extends DisqusAPI {
         $SQL = 'CREATE TABLE IF NOT EXISTS ' . $this->table . ' (';
         $SQL_fields = array();
         foreach ($this->fields as $field => $data_type) {
-            $SQL_fields[] = $field . ' ' . $datatype;
+            $SQL_fields[] = $field . ' ' . $data_type;
         }
         $SQL .= implode(',', $SQL_fields) . ');';
         $db->exec($SQL);
