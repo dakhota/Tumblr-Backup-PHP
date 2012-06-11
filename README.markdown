@@ -1,3 +1,8 @@
+__WARNING__: This code no longer authenticates against the Tumblr API from what I can see. I am not supporting this code any more, but I will leave it here for anyone who wants to fork etc.
+
+---------------------------------------
+
+
 Tumblr and/or Disqus Backup (PHP)
 ======
 This script has been designed to run on the CLI and as such you may need to update the first line in run.php file to reflect the location of the PHP binary on your machine.
